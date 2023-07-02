@@ -1,5 +1,6 @@
 from pathlib import Path
 import pickle
+import timeit
 
 import psycopg2
 import torch
@@ -41,19 +42,23 @@ def insert_data_table():
 def main():
     records = Database.select_all()
 
+    image = Image.open("uKF9WyvZlbE.jpg").convert('RGB')
+    preprocessed = preprocess(image)
+    output_image = model(preprocessed)
+
+    start_time = timeit.default_timer()
+
     for record in records:
         featuremap, path_image = record
         featuremap = torch.tensor(pickle.loads(featuremap))
-
-        image = Image.open("uKF9WyvZlbE.jpg").convert('RGB')
-        preprocessed = preprocess(image)
-        output_image = model(preprocessed)
 
         cos = torch.nn.CosineSimilarity(dim=1)
         cos = cos(torch.Tensor(featuremap.unsqueeze(0)), torch.Tensor(output_image))
 
         if cos[0] > 0.95:
             print(path_image)
+
+    print(timeit.default_timer() - start_time)
 
 
 if __name__ == "__main__":
