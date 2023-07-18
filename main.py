@@ -42,9 +42,12 @@ def insert_data_table():
 def main():
     records = Database.select_all()
 
-    image = Image.open("uKF9WyvZlbE.jpg").convert('RGB')
+    start_time = timeit.default_timer()
+    image = Image.open("book.jpg").convert('RGB')
     preprocessed = preprocess(image)
     output_image = model(preprocessed)
+    print(timeit.default_timer() - start_time)
+
 
     start_time = timeit.default_timer()
 
